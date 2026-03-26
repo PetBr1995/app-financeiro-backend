@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+
+# Local DB / caches
+app.db
+__pycache__/
+*.pyc
