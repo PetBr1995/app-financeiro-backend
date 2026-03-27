@@ -20,3 +20,9 @@ class User(db.Model):
     categories = db.relationship("Category", backref="user", lazy=True, cascade="all, delete-orphan")
     incomes = db.relationship("Income", backref="user", lazy=True, cascade="all, delete-orphan")
     expenses = db.relationship("Expense", backref="user", lazy=True, cascade="all, delete-orphan")
+    password_reset_tokens = db.relationship(
+        "PasswordResetToken",
+        backref="user",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )

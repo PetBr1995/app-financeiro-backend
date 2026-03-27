@@ -93,6 +93,8 @@ API disponível em `http://127.0.0.1:5000`.
 ### Auth
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
 - `GET /api/auth/me`
 
 ### Categories
@@ -117,6 +119,84 @@ API disponível em `http://127.0.0.1:5000`.
 
 ### Dashboard
 - `GET /api/dashboard/summary?month=3&year=2026`
+
+## Integração Frontend (Auth)
+
+### Formato padrão de erro
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "Dados inválidos",
+    "details": {
+      "password": ["A senha deve ter no mínimo 8 caracteres"]
+    }
+  }
+}
+```
+
+### Recuperar senha
+
+`POST /api/auth/forgot-password`
+
+Request:
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+Response (`200`):
+
+```json
+{
+  "message": "Se o email estiver cadastrado, você receberá instruções para redefinir a senha."
+}
+```
+
+Observação:
+- Em `development/testing`, pode retornar `data.reset_token` para facilitar testes de frontend.
+- Em `production`, o recomendado é não retornar token na API (`PASSWORD_RESET_RETURN_TOKEN=false`).
+- Com SMTP configurado, o backend envia email real com link de redefinição.
+
+### Redefinir senha
+
+`POST /api/auth/reset-password`
+
+Request:
+
+```json
+{
+  "token": "TOKEN_DE_RECUPERACAO",
+  "password": "novaSenha123"
+}
+```
+
+Response (`200`):
+
+```json
+{
+  "message": "Senha redefinida com sucesso"
+}
+```
+
+Erros esperados:
+- `400 validation_error` para senha inválida (ex.: menos de 8 caracteres).
+- `400 invalid_reset_token` para token inválido, expirado ou já utilizado.
+
+### Variáveis para envio de email
+
+- `PASSWORD_RESET_FRONTEND_URL` (ex.: `https://seu-front.com/reset-password?token={token}`)
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USERNAME`
+- `SMTP_PASSWORD`
+- `SMTP_FROM_EMAIL`
+- `SMTP_FROM_NAME`
+- `SMTP_USE_TLS`
+- `SMTP_USE_SSL`
 
 ## Rodar testes
 

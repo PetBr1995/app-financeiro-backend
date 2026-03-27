@@ -31,6 +31,14 @@ def _build_cors_supports_credentials():
     return os.getenv("CORS_SUPPORTS_CREDENTIALS", "true").strip().lower() == "true"
 
 
+def _build_password_reset_return_token(default=False):
+    return os.getenv("PASSWORD_RESET_RETURN_TOKEN", str(default).lower()).strip().lower() == "true"
+
+
+def _build_bool_env(name, default=False):
+    return os.getenv(name, str(default).lower()).strip().lower() == "true"
+
+
 def _build_database_uri():
     """
     Resolve a database URI for both local and production environments.
@@ -79,10 +87,25 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_HOURS", "24")))
     CORS_ORIGINS = _build_cors_origins()
     CORS_SUPPORTS_CREDENTIALS = _build_cors_supports_credentials()
+    PASSWORD_RESET_TOKEN_EXPIRES_MINUTES = int(os.getenv("PASSWORD_RESET_TOKEN_EXPIRES_MINUTES", "30"))
+    PASSWORD_RESET_RETURN_TOKEN = _build_password_reset_return_token(default=False)
+    PASSWORD_RESET_FRONTEND_URL = os.getenv(
+        "PASSWORD_RESET_FRONTEND_URL",
+        "http://localhost:3000/reset-password?token={token}",
+    )
+    SMTP_HOST = os.getenv("SMTP_HOST")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USERNAME = os.getenv("SMTP_USERNAME")
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+    SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL")
+    SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Financas API")
+    SMTP_USE_TLS = _build_bool_env("SMTP_USE_TLS", default=True)
+    SMTP_USE_SSL = _build_bool_env("SMTP_USE_SSL", default=False)
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    PASSWORD_RESET_RETURN_TOKEN = _build_password_reset_return_token(default=True)
 
 
 class TestingConfig(Config):
@@ -90,6 +113,7 @@ class TestingConfig(Config):
     # Keep tests isolated and fast regardless of external DATABASE_URL.
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
+    PASSWORD_RESET_RETURN_TOKEN = True
 
 
 class ProductionConfig(Config):

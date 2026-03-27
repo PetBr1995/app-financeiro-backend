@@ -18,7 +18,17 @@ def build_openapi_spec(base_url="http://127.0.0.1:5000"):
             "schemas": {
                 "ErrorResponse": {
                     "type": "object",
-                    "properties": {"error": {"type": "string"}},
+                    "properties": {
+                        "error": {
+                            "type": "object",
+                            "properties": {
+                                "code": {"type": "string"},
+                                "message": {"type": "string"},
+                                "details": {"type": "object", "nullable": True},
+                            },
+                            "required": ["code", "message"],
+                        }
+                    },
                     "required": ["error"],
                 },
                 "AuthRegisterRequest": {
@@ -37,6 +47,21 @@ def build_openapi_spec(base_url="http://127.0.0.1:5000"):
                         "password": {"type": "string"},
                     },
                     "required": ["email", "password"],
+                },
+                "AuthForgotPasswordRequest": {
+                    "type": "object",
+                    "properties": {
+                        "email": {"type": "string", "format": "email"},
+                    },
+                    "required": ["email"],
+                },
+                "AuthResetPasswordRequest": {
+                    "type": "object",
+                    "properties": {
+                        "token": {"type": "string"},
+                        "password": {"type": "string", "minLength": 8},
+                    },
+                    "required": ["token", "password"],
                 },
                 "User": {
                     "type": "object",
@@ -209,6 +234,40 @@ def build_openapi_spec(base_url="http://127.0.0.1:5000"):
                             },
                         },
                         "401": {"description": "Credenciais inválidas"},
+                    },
+                }
+            },
+            "/api/auth/forgot-password": {
+                "post": {
+                    "tags": ["Auth"],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/AuthForgotPasswordRequest"}
+                            }
+                        },
+                    },
+                    "responses": {
+                        "200": {"description": "Solicitação de recuperação recebida"},
+                        "400": {"description": "Erro de validação"},
+                    },
+                }
+            },
+            "/api/auth/reset-password": {
+                "post": {
+                    "tags": ["Auth"],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/AuthResetPasswordRequest"}
+                            }
+                        },
+                    },
+                    "responses": {
+                        "200": {"description": "Senha redefinida com sucesso"},
+                        "400": {"description": "Token inválido/expirado ou erro de validação"},
                     },
                 }
             },
