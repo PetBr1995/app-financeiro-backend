@@ -6,8 +6,8 @@ from app.models.category import Category
 from app.models.user import User
 
 DEFAULT_NAME = "Admin"
-DEFAULT_EMAIL = "admin@financas.local"
-DEFAULT_PASSWORD = "admin12345"
+DEFAULT_EMAIL = "peterson@agenciadigital.com.vc"
+DEFAULT_PASSWORD = "123456"
 DEFAULT_CATEGORIES = ["Moradia", "Alimentacao", "Transporte", "Saude", "Lazer"]
 
 

@@ -36,16 +36,26 @@ def create_app(config_name=None):
 def register_error_handlers(app):
     @app.errorhandler(ValidationError)
     def handle_validation_error(err):
-        return error_response(err.messages, 400)
+        return error_response(
+            message="Dados inválidos",
+            status_code=400,
+            code="validation_error",
+            details=err.messages,
+        )
 
     @app.errorhandler(AppError)
     def handle_app_error(err):
-        return error_response(err.message, err.status_code)
+        return error_response(
+            message=err.message,
+            status_code=err.status_code,
+            code=err.code,
+            details=err.details,
+        )
 
     @app.errorhandler(404)
     def handle_not_found(_):
-        return error_response("Recurso não encontrado", 404)
+        return error_response("Recurso não encontrado", 404, code="not_found")
 
     @app.errorhandler(500)
     def handle_internal_error(_):
-        return error_response("Erro interno do servidor", 500)
+        return error_response("Erro interno do servidor", 500, code="internal_error")
